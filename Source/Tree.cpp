@@ -7,9 +7,10 @@
 #include "Tree.h"
 #include "Map.h"
 
-Tree::Tree(long long int Ipx, long long int Ipy)
+Tree::Tree(long long int Ipx,
+		   long long int Ipy)
 {
-	this->Root = new Node;
+	this->Root = std::make_shared<Node>();
 	this->initPosx = Ipx;
 	this->initPosy = Ipy;
 
@@ -17,9 +18,11 @@ Tree::Tree(long long int Ipx, long long int Ipy)
 	this->Root->py = 0;
 }
 
-Node * Tree::createNode(Node * Pointer, long long int Ipx, long long int Ipy)
+std::shared_ptr<Node> Tree::createNode(std::shared_ptr<Node> Pointer,
+		                               long long int Ipx,
+									   long long int Ipy)
 {//Pointer is the father
-	Node * Temp = new Node;
+	std::shared_ptr<Node> Temp = std::make_shared<Node>();
 
 	Temp->px=Ipx;
 	Temp->py=Ipy;
@@ -29,16 +32,17 @@ Node * Tree::createNode(Node * Pointer, long long int Ipx, long long int Ipy)
 	return Temp;
 }
 
-Node * Tree::exploreMapbyDepth(Map * M, Node *Ptr)
+std::shared_ptr<Node> Tree::exploreMapbyDepth(std::shared_ptr<Map> M,
+		                                      std::shared_ptr<Node> Ptr)
 {
 	long long int Cx = 0;
 	long long int Cy = 0;
 	long long int Ccx = 0;
 	long long int Ccy = 0;
 
-	Node * Pointer = Ptr;
-	Node * retVal = nullptr;
-	Node * AuxNode = nullptr;
+	std::shared_ptr<Node> Pointer = Ptr;
+	std::shared_ptr<Node> retVal = nullptr;
+	std::shared_ptr<Node> AuxNode = nullptr;
 
 	Cx = this->initPosx + Pointer->px;
 	Cy = this->initPosy + Pointer->py;
@@ -62,7 +66,7 @@ Node * Tree::exploreMapbyDepth(Map * M, Node *Ptr)
 				retVal = AuxNode;
 
 				std::cout<<"\nGoing up to the parent..."<<std::endl;
-				Node *ppt = Pointer;
+				std::shared_ptr<Node>ppt = Pointer;
 				Map auxMap = *M;
 
 				long long int prev_px = retVal->px;
@@ -110,18 +114,19 @@ Node * Tree::exploreMapbyDepth(Map * M, Node *Ptr)
 	return retVal;
 }
 
-Node * Tree::exploreMapbyBreadth(Map * M, Node *Ptr)
+std::shared_ptr<Node> Tree::exploreMapbyBreadth(std::shared_ptr<Map> M,
+		                                        std::shared_ptr<Node> Ptr)
 {
 	long long int Cx = 0;
 	long long int Cy = 0;
 	long long int Ccx = 0;
 	long long int Ccy = 0;
 
-	Node * Pointer = nullptr;
-	Node * retVal = nullptr;
-	Node * AuxNode = nullptr;
+	std::shared_ptr<Node> Pointer = nullptr;
+	std::shared_ptr<Node> retVal = nullptr;
+	std::shared_ptr<Node> AuxNode = nullptr;
 
-	std::list<Node*> bag;
+	std::list<std::shared_ptr<Node>> bag;
 	bag.push_back(Ptr);
 
 	while(bag.size()>0)
@@ -161,7 +166,7 @@ Node * Tree::exploreMapbyBreadth(Map * M, Node *Ptr)
 					this->setofRoads.push_back(AuxNode);
 
 					std::cout<<"\nGoing up to the parent..."<<std::endl;
-					Node *ppt = Pointer;
+					std::shared_ptr<Node> ppt = Pointer;
 					Map auxMap = *M;
 
 					long long int prev_px = retVal->px;
@@ -219,15 +224,15 @@ Node * Tree::exploreMapbyBreadth(Map * M, Node *Ptr)
 
 void Tree::printTree()
 {
-	Node * Pointer = this->Root;
+	std::shared_ptr<Node> Pointer = this->Root;
 	long long int level = 0;
 
-	std::list<Node *> bag;
+	std::list<std::shared_ptr<Node>> bag;
 	bag.push_back(Pointer);
 
 	while(bag.size()>0)
 	{
-		Node * tp = bag.front();
+		std::shared_ptr<Node> tp = bag.front();
 		if(level < tp->Level) std::cout<<std::endl;
 		std::cout<<"("<< tp->px <<","<< tp->py <<") ";
 		level = tp->Level;
@@ -240,6 +245,6 @@ void Tree::printTree()
 
 Tree::~Tree()
 {
-	delete this->Root;
+	//delete this->Root;
 }
 

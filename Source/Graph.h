@@ -13,6 +13,7 @@
 #include <list>
 #include <limits.h>
 #include <float.h>
+#include <memory>
 
 #include "Map.h"
 
@@ -48,8 +49,8 @@ struct NdG{
 	double cummulativeDistance = DBL_MAX;
 
 	long long int Level = LLONG_MAX;
-	struct NdG * Parent = nullptr;
-	std::vector<struct NdG *>Connections;
+	std::shared_ptr<struct NdG> Parent = nullptr;
+	std::vector< std::shared_ptr<struct NdG> >Connections;
 }typedef NodeG;
 
 class Graph
@@ -57,10 +58,10 @@ class Graph
 	long long int initPosx = 0;
 	long long int initPosy = 0;
 
-	NodeG * StartPoint;
+	std::shared_ptr<NodeG> StartPoint;
 
-	NodeG * HeadList;
-	NodeG * DestinationNode;
+	std::shared_ptr<NodeG> HeadList;
+	std::shared_ptr<NodeG> DestinationNode;
 
 	std::map<long long int,std::vector<long long int>> mapNodesGraph;
 	std::map<long long int,std::vector<long long int>> mapPositionsGraph;
@@ -72,17 +73,24 @@ class Graph
 	std::map<long long int,std::vector<long long int>> mapArrivaltoShareGraphRight;
 
 public:
-	Graph(long long int Ipx, long long int Ipy);
-	NodeG * returnStartPoint();
-	NodeG * createNode(NodeG * Pointer, long long int Ipx, long long int Ipy, int type);
-	NodeG * growGraphStepOne(Map * M, NodeG *ptr);
-	void growGraphStepTwo(Map * M);
-	NodeG * growGraph(Map * M);
-	void growGraphStepThree(Map * M);
+	Graph(long long int Ipx,
+		  long long int Ipy);
+	std::shared_ptr<NodeG> returnStartPoint();
+	std::shared_ptr<NodeG> createNode(std::shared_ptr<NodeG> Pointer,
+			                          long long int Ipx,
+									  long long int Ipy,
+									  int type);
+	std::shared_ptr<NodeG> growGraphStepOne(std::shared_ptr<Map> M,
+			                                std::shared_ptr<NodeG> ptr);
+	void growGraphStepTwo(std::shared_ptr<Map> M);
+	std::shared_ptr<NodeG> growGraph(std::shared_ptr<Map> M);
+	void growGraphStepThree(std::shared_ptr<Map> M);
 	void cleanAllFlags();
-	char computeConnections(Map * M, NodeG* Tile);
-	void assignLevel(Map * M);
-	double findPath(std::list<NodeG*> &Path,NodeG * Pointer);
+	char computeConnections(std::shared_ptr<Map> M,
+			                std::shared_ptr<NodeG> Tile);
+	void assignLevel(std::shared_ptr<Map> M);
+	double findPath(std::list< std::shared_ptr<NodeG> > &Path,
+			        std::shared_ptr<NodeG> Pointer);
 
 	~Graph();
 };

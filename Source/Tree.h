@@ -11,6 +11,7 @@
 #include <vector>
 #include <list>
 #include <math.h>
+#include <memory>
 #include "Map.h"
 
 //const long long int DeltaX[] = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -37,8 +38,8 @@ struct Nd{
 
 	double cummulativeDistance = 0.0;
 
-	struct Nd * Parent = nullptr;
-	std::vector<struct Nd *>Connections;
+	std::shared_ptr<struct Nd> Parent = nullptr;
+	std::vector<std::shared_ptr<struct Nd>> Connections;
 }typedef Node;
 
 class Tree
@@ -46,15 +47,20 @@ class Tree
 	long long int initPosx=0;
 	long long int initPosy=0;
 
-	std::list<Node*> setofRoads;
+	std::list< std::shared_ptr<Node> > setofRoads;
 
 	const int Nconst = 8;
 public:
-	Node * Root;
-	Tree(long long int Ipx, long long int Ipy);
-	Node * createNode(Node * Pointer, long long int Ipx, long long int Ipy);
-	Node * exploreMapbyDepth(Map * M, Node *Pointer);//Return the node that has the destination;
-	Node * exploreMapbyBreadth(Map * M, Node *Pointer);
+	std::shared_ptr<Node> Root;
+	Tree(long long int Ipx,
+	     long long int Ipy);
+	std::shared_ptr<Node> createNode(std::shared_ptr<Node> Pointer,
+			                         long long int Ipx,
+									 long long int Ipy);
+	std::shared_ptr<Node> exploreMapbyDepth(std::shared_ptr<Map> M,
+			                                std::shared_ptr<Node> Pointer);//Return the node that has the destination;
+	std::shared_ptr<Node> exploreMapbyBreadth(std::shared_ptr<Map> M,
+			                                  std::shared_ptr<Node> Pointer);
 	void printTree();
 
 	~Tree();

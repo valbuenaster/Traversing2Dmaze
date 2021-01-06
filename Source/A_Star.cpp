@@ -11,10 +11,13 @@
 
 
 
-A_Star::A_Star(long long int Sx,long long int Sy,long long int Ex,long long int Ey)
+A_Star::A_Star(long long int Sx,
+		       long long int Sy,
+			   long long int Ex,
+			   long long int Ey)
 {
-	this->StartNode = new NodeS;
-	this->EndNode = new NodeS;
+	this->StartNode = std::make_shared<NodeS>();
+	this->EndNode = std::make_shared<NodeS>();
 
 	this->StartNode->px = Sx;
 	this->StartNode->py = Sy;
@@ -25,9 +28,9 @@ A_Star::A_Star(long long int Sx,long long int Sy,long long int Ex,long long int 
 	this->EndNode->py = Ey;
 
 	this->StartNode->stateNeighbors = vector<char> (N_CONN_S,' ');
-	this->StartNode->Connections = vector<NodeS *>(N_CONN_S,nullptr);
+	this->StartNode->Connections = vector<std::shared_ptr<NodeS>>(N_CONN_S,nullptr);
 	this->EndNode->stateNeighbors = vector<char> (N_CONN_S,' ');
-	this->EndNode->Connections = vector<NodeS *>(N_CONN_S,nullptr);
+	this->EndNode->Connections = vector<shared_ptr<NodeS>>(N_CONN_S,nullptr);
 
 
 	this->mapWHAT2MOVE= { {0, {1, 2, 8, 6, 7}},
@@ -58,7 +61,10 @@ A_Star::A_Star(long long int Sx,long long int Sy,long long int Ex,long long int 
 							 {7,{0, 6, 1, 5, 2, 4, 3}}};
 }
 
-int A_Star::exploreNeighbors(Map* M, NodeS* ptr, long long int Vx, long long int Vy)
+int A_Star::exploreNeighbors(std::shared_ptr<Map> M,
+		                     std::shared_ptr<NodeS> ptr,
+							 long long int Vx,
+							 long long int Vy)
 {
 	int retVal = -1;
 	double maxVal = 0.0;
@@ -103,11 +109,12 @@ int A_Star::exploreNeighbors(Map* M, NodeS* ptr, long long int Vx, long long int
 	return retVal;
 }
 
-void A_Star::createConnections(NodeS * ptrParent, int index)
+void A_Star::createConnections(std::shared_ptr<NodeS> ptrParent,
+		                       int index)
 {
 	vector<long long int> whatTomove = this->mapWHAT2MOVE[index];
 	vector<long long int> whereTomove = this->mapWHERE2MOVE[index];
-	NodeS * ptr = ptrParent->Connections[index];
+	std::shared_ptr<NodeS> ptr = ptrParent->Connections[index];
 
 	int Size = whatTomove.size();
 
@@ -128,27 +135,28 @@ void A_Star::createConnections(NodeS * ptrParent, int index)
 	}
 }
 
-NodeS * A_Star::createNode(NodeS * ptrParent,int index)
+std::shared_ptr<NodeS> A_Star::createNode(std::shared_ptr<NodeS> ptrParent,
+		                                  int index)
 {
-	NodeS* ptr = new NodeS;
+	std::shared_ptr<NodeS> ptr = std::make_shared<NodeS>();
 	ptr->px = ptrParent->px + DeltaXS[index];
 	ptr->py = ptrParent->py + DeltaYS[index];
 	ptr->Parent = ptrParent;
 	ptr->cummulativeDistance = ptrParent->cummulativeDistance + DifferentialCost[index];
 	ptr->stateNeighbors = vector<char> (N_CONN_S,' ');
-	ptr->Connections = vector<NodeS *>(N_CONN_S,nullptr);
+	ptr->Connections = vector<std::shared_ptr<NodeS>>(N_CONN_S,nullptr);
 
 	return ptr;
 }
 
-bool A_Star::evolve(Map* M)
+bool A_Star::evolve(std::shared_ptr<Map> M)
 {
 	bool retVal = false;
-	list<NodeS*> bag;
+	list<std::shared_ptr<NodeS>> bag;
 	long long int Vx;
 	long long int Vy;
 	int ii_grow;
-	NodeS * Pointer = nullptr;
+	std::shared_ptr<NodeS> Pointer = nullptr;
 	bag.push_front(this->StartNode);
 	vector<long long int> vectElem;
 
@@ -221,13 +229,13 @@ bool A_Star::evolve(Map* M)
 	return retVal;
 }
 
-NodeS * A_Star::returnEndNode()
+std::shared_ptr<NodeS> A_Star::returnEndNode()
 {
 	return this->EndNode;
 }
 
 A_Star::~A_Star()
 {
-	delete this->StartNode;
-	delete this->EndNode;
+	//delete this->StartNode;
+	//delete this->EndNode;
 }

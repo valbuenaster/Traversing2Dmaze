@@ -15,6 +15,7 @@
 #include <float.h>
 #include <math.h>
 #include <bits/stdc++.h>
+#include <memory>
 
 #include "Map.h"
 
@@ -41,27 +42,36 @@ struct NdS{
 	double cummulativeDistance = DBL_MAX;
 
 	long long int Level = LLONG_MAX;
-	struct NdS * Parent = nullptr;
+	std::shared_ptr<struct NdS> Parent = nullptr;
 
 	vector<char> stateNeighbors;
-	vector<struct NdS *>Connections;
+	vector< std::shared_ptr<struct NdS> >Connections;
 }typedef NodeS;
 
 class A_Star
 {
-	NodeS * StartNode;
-	NodeS * EndNode;
+	std::shared_ptr<NodeS> StartNode;
+	std::shared_ptr<NodeS> EndNode;
 
 	map<long long int,vector<long long int>> mapWHERE2MOVE;
 	map<long long int,vector<long long int>> mapWHAT2MOVE;
 	map<long long int,vector<long long int>> mapConnInsOrder;
+
 public:
-	A_Star(long long int Sx,long long int Sy,long long int Ex,long long int Ey);
-	bool evolve(Map* M);
-	int exploreNeighbors(Map* M, NodeS* ptr, long long int Vx, long long int Vy);
-	NodeS * createNode(NodeS * ptrParent,int index);
-	void createConnections(NodeS * ptr, int index);
-	NodeS * returnEndNode();
+	A_Star(long long int Sx,
+	       long long int Sy,
+		   long long int Ex,
+		   long long int Ey);
+	bool evolve(std::shared_ptr<Map> M);
+	int exploreNeighbors(std::shared_ptr<Map> M,
+			             std::shared_ptr<NodeS> ptr,
+						 long long int Vx,
+						 long long int Vy);
+	std::shared_ptr<NodeS> createNode(std::shared_ptr<NodeS> ptrParent,
+			                          int index);
+	void createConnections(std::shared_ptr<NodeS> ptr,
+			               int index);
+	std::shared_ptr<NodeS> returnEndNode();
 
 	~A_Star();
 };

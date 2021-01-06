@@ -6,9 +6,10 @@
  */
 #include "Graph.h"
 
-Graph::Graph(long long int Ipx, long long int Ipy)
+Graph::Graph(long long int Ipx,
+		     long long int Ipy)
 {
-	this->StartPoint = new NodeG;
+	this->StartPoint = std::make_shared<NodeG>();
 
 	this->initPosx = Ipx;
 	this->initPosy = Ipy;
@@ -23,7 +24,7 @@ Graph::Graph(long long int Ipx, long long int Ipy)
 	this->StartPoint->cummulativeDistance = 0.0;
 	this->StartPoint->Level = 0;
 
-	this->StartPoint->Connections = std::vector<NodeG *>(N_CONN,nullptr);
+	this->StartPoint->Connections = std::vector< std::shared_ptr<NodeG> >(N_CONN,nullptr);
 
 	this->DestinationNode = nullptr;
 	this->HeadList = nullptr;
@@ -106,14 +107,17 @@ Graph::Graph(long long int Ipx, long long int Ipy)
 										  {7, {}}};
 }
 
-NodeG * Graph::returnStartPoint()
+std::shared_ptr<NodeG> Graph::returnStartPoint()
 {
 	return this->StartPoint;
 }
 
-NodeG * Graph::createNode(NodeG * Pointer, long long int Ipx, long long int Ipy, int type)
+std::shared_ptr<NodeG> Graph::createNode(std::shared_ptr<NodeG> Pointer,
+		                                 long long int Ipx,
+										 long long int Ipy,
+										 int type)
 {
-	NodeG * Temp = new NodeG;
+	std::shared_ptr<NodeG> Temp = std::make_shared<NodeG>();
 
 	Temp->px = Ipx;
 	Temp->py = Ipy;
@@ -123,17 +127,18 @@ NodeG * Graph::createNode(NodeG * Pointer, long long int Ipx, long long int Ipy,
 
 	Temp->NodeType = type;
 
-	Temp->Connections = std::vector<NodeG *>(N_CONN,nullptr);
+	Temp->Connections = std::vector< std::shared_ptr<NodeG> >(N_CONN,nullptr);
 
 	return Temp;
 }
 
-NodeG * Graph::growGraphStepOne(Map * M, NodeG *ptr)
+std::shared_ptr<NodeG> Graph::growGraphStepOne(std::shared_ptr<Map> M,
+		                                       std::shared_ptr<NodeG> ptr)
 {
-	std::list<NodeG *> bag;
+	std::list< std::shared_ptr<NodeG> > bag;
 	unsigned long long int upperBound = M->returnBoundPlaces();
-	NodeG * Pointer;
-	NodeG * retVal = nullptr;
+	std::shared_ptr<NodeG> Pointer;
+	std::shared_ptr<NodeG> retVal = nullptr;
 
 	M->setAsVisited(this->initPosx + ptr->px,this->initPosy + ptr->py);
 	bag.push_back(ptr);
@@ -162,7 +167,7 @@ NodeG * Graph::growGraphStepOne(Map * M, NodeG *ptr)
 
 			if(( retValMap == EMPTY_SPACE || retValMap == DESTINATION )&& !ocupied)
 			{
-				NodeG * temp = this->createNode(Pointer,Pointer->px + DeltaXG[nn], Pointer->py + DeltaYG[nn],nn);
+				std::shared_ptr<NodeG> temp = this->createNode(Pointer,Pointer->px + DeltaXG[nn], Pointer->py + DeltaYG[nn],nn);
 				M->setAsVisited(Cx + DeltaXG[nn], Cy+ DeltaYG[nn]);
 				Pointer->Connections[nn] = temp;
 				bag.push_back(temp);
@@ -218,7 +223,8 @@ NodeG * Graph::growGraphStepOne(Map * M, NodeG *ptr)
 	return retVal;
 }
 
-char Graph::computeConnections(Map * M, NodeG* Tile)
+char Graph::computeConnections(std::shared_ptr<Map> M,
+		                       std::shared_ptr<NodeG> Tile)
 {
 	int vcounter = 0;
 	int wcounter = 0;
@@ -278,10 +284,10 @@ char Graph::computeConnections(Map * M, NodeG* Tile)
 	return retVal;
 }
 
-void Graph::growGraphStepTwo(Map * M)
+void Graph::growGraphStepTwo(std::shared_ptr<Map> M)
 {
-	NodeG * Pointer;
-	std::list<NodeG *> bag;
+	std::shared_ptr<NodeG> Pointer;
+	std::list<std::shared_ptr<NodeG>> bag;
 
 	bag.push_back(this->StartPoint);
 
@@ -302,7 +308,7 @@ void Graph::growGraphStepTwo(Map * M)
 			//std::cout<<"After internal connection, we have"<<std::endl;
 			for(int nn = 0;nn<N_CONN;nn++)
 			{
-				NodeG* ptr = Pointer->Connections[nn];
+				std::shared_ptr<NodeG> ptr = Pointer->Connections[nn];
 
 				if(ptr==nullptr) continue;
 				if(this->computeConnections(M, ptr)=='C') continue;
@@ -348,14 +354,14 @@ void Graph::growGraphStepTwo(Map * M)
 				std::vector<long long int> v_ArrivaltoShareGraphLeft = this->mapArrivaltoShareGraphLeft[nn];
 				std::vector<long long int> v_ArrivaltoShareGraphRight = this->mapArrivaltoShareGraphRight[nn];
 
-				NodeG* ptr = Pointer->Connections[nn];
+				std::shared_ptr<NodeG> ptr = Pointer->Connections[nn];
 
 				if(ptr==nullptr) continue;
 				//if(this->computeConnections(M, ptr)=='C') continue;
 
 				if(ptr!=nullptr)
 				{
-					NodeG* ptr_aux = nullptr;
+					std::shared_ptr<NodeG> ptr_aux = nullptr;
 
 
 					switch(v_NodeCanProvideTo.size())
@@ -464,17 +470,17 @@ void Graph::growGraphStepTwo(Map * M)
 	}
 }
 
-void Graph::growGraphStepThree(Map * M)
+void Graph::growGraphStepThree(std::shared_ptr<Map> M)
 {
-	std::list<NodeG* > bag;
-	std::multimap<int,NodeG*> MapaIncompletes;
+	std::list<std::shared_ptr<NodeG> > bag;
+	std::multimap< int, std::shared_ptr<NodeG> > MapaIncompletes;
 	bag.push_back(this->StartPoint);
 	char eval = ' ';
 	std::vector<long long int> NodesExplore = {0, 1, 2, 3, 4, 5, 6, 7};
 
 	while(bag.size()>0)
 	{
-		NodeG* Pointer = bag.front();
+		std::shared_ptr<NodeG> Pointer = bag.front();
 		Pointer->visited = true;
 
 		eval = this->computeConnections(M, Pointer);
@@ -532,12 +538,12 @@ void Graph::growGraphStepThree(Map * M)
 
 void Graph::cleanAllFlags()
 {
-	std::list<NodeG* > bag;
+	std::list< std::shared_ptr<NodeG> > bag;
 	bag.push_back(this->StartPoint);
 
 	while(bag.size()>0)
 	{
-		NodeG* Pointer = bag.front();
+		std::shared_ptr<NodeG> Pointer = bag.front();
 
 		Pointer->visited = false;
 		Pointer->flagA = false;
@@ -565,10 +571,10 @@ void Graph::cleanAllFlags()
 	}
 }
 
-NodeG * Graph::growGraph(Map * M)
+std::shared_ptr<NodeG> Graph::growGraph(std::shared_ptr<Map> M)
 {
 	//std::cout<<std::endl<<"Results with Graph.\nDoing phase 1"<<std::endl;
-	NodeG *retVal = this->growGraphStepOne(M,this->StartPoint);
+	std::shared_ptr<NodeG> retVal = this->growGraphStepOne(M,this->StartPoint);
 	//retVal->cummulativeDistance = 0.0;
 
 	//std::cout<<std::endl<<std::endl<<"DOING PHASE TWO... "<<std::endl;
@@ -584,10 +590,10 @@ NodeG * Graph::growGraph(Map * M)
 	return retVal;
 }
 
-void Graph::assignLevel(Map * M)
+void Graph::assignLevel(std::shared_ptr<Map> M)
 {
-	NodeG* Pointer = nullptr;
-	std::list<NodeG*> bag;
+	std::shared_ptr<NodeG> Pointer = nullptr;
+	std::list< std::shared_ptr<NodeG> > bag;
 
 	bag.push_back(this->StartPoint);
 
@@ -611,7 +617,7 @@ void Graph::assignLevel(Map * M)
 
 					int pcounter = 0;
 					int counterSelect = 0;
-					NodeG * ptrSelect = nullptr;
+					std::shared_ptr<NodeG> ptrSelect = nullptr;
 					for(auto v:el->Connections)
 					{
 						if(v!=nullptr)
@@ -637,15 +643,16 @@ void Graph::assignLevel(Map * M)
 	}
 }
 
-double Graph::findPath(std::list<NodeG*> &Path,NodeG * Pointer)
+double Graph::findPath(std::list<std::shared_ptr<NodeG>> &Path,
+		               std::shared_ptr<NodeG> Pointer)
 {
 	double retVal = 0.0;
 
-	NodeG* ptr = Pointer;
+	std::shared_ptr<NodeG> ptr = Pointer;
 
 	while(ptr->Parent != nullptr)
 	{
-		NodeG* candidate = nullptr;
+		std::shared_ptr<NodeG> candidate = nullptr;
 		double Temp = DBL_MAX;
 
 		//std::cout<<"contenders: \n\t";
@@ -680,5 +687,5 @@ double Graph::findPath(std::list<NodeG*> &Path,NodeG * Pointer)
 
 Graph::~Graph()
 {
-	delete this->StartPoint;
+	//delete this->StartPoint;
 }

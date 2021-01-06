@@ -13,29 +13,30 @@ using namespace std;
 
 int main()
 {
+	shared_ptr<Map> Mapa = nullptr;
+	shared_ptr<Map> Mapa2 = nullptr;
+	shared_ptr<Map> Mapa3 = nullptr;
+	shared_ptr<Map> MapaAS = nullptr;
+	shared_ptr<Map> MapaDisplay = nullptr;
+
 	long long int N = 0;
 	long long int M = 0;
 	long long int Ix = 0;
 	long long int Iy = 0;
 	string Str;
-	Map *Mapa;
-	Map *Mapa2;
-	Map *Mapa3;
-	Map *MapaAS;
-	Map *MapaDisplay;
-	Tree *Arbol;
-	Graph *Grafo;
-	A_Star *Algorithm;
+
+	shared_ptr<Tree> Arbol;
+	shared_ptr<Graph> Grafo;
+	shared_ptr<A_Star> Algorithm;
 
 	cout <<"Hello, please write the map's dimensions"<<endl;
-
 	cin >> N>>M;
 
-	Mapa = new Map(N,M);
-	Mapa2 = new Map(N,M);
-	Mapa3 = new Map(N,M);
-	MapaAS = new Map(N,M);
-	MapaDisplay = new Map(N,M);
+	Mapa = make_shared<Map>(N,M);
+	Mapa2 = make_shared<Map>(N,M);
+	Mapa3 = make_shared<Map>(N,M);
+	MapaAS = make_shared<Map>(N,M);
+	MapaDisplay = make_shared<Map>(N,M);
 
 	cout <<"The map is "<< N<<" by "<< M<<endl;
 	cout <<"Enter the map"<<endl;
@@ -62,32 +63,32 @@ int main()
 	cout<<"\nPrinting the map back"<<endl<<endl;
 	Mapa->printMap();
 
-	Arbol = new Tree(Ix,Iy);
-	Grafo = new Graph(Ix,Iy);
+	Arbol = make_shared<Tree>(Ix,Iy);
+	Grafo = make_shared<Graph>(Ix,Iy);
 
 	cout<<endl<<"Exploring the map with a tree in DEPTH approach..."<<endl;
-	Node * Destination = Arbol->exploreMapbyDepth(Mapa,Arbol->Root);
+	shared_ptr<Node> Destination = Arbol->exploreMapbyDepth(Mapa,Arbol->Root);
 	cout<<"Done exploring."<<endl;
 
 	cout<<endl<<"Exploring the map with a tree in BREADTH approach..."<<endl;
-	Node * Destination2 = Arbol->exploreMapbyBreadth(Mapa2,Arbol->Root);
+	shared_ptr<Node> Destination2 = Arbol->exploreMapbyBreadth(Mapa2,Arbol->Root);
 	cout<<"Done exploring."<<endl;
 
 	Mapa2->cleanVisits();
 
-	NodeG * DestinationB = Grafo->growGraph(Mapa3);
+	shared_ptr<NodeG> DestinationB = Grafo->growGraph(Mapa3);
 
-	NodeG * TheRoot = Grafo->returnStartPoint();
+	shared_ptr<NodeG> TheRoot = Grafo->returnStartPoint();
 
-	/*
-	cout<<"Printing third map"<<endl;
-	Mapa3->printMap();
-	cout<<endl;
-	*/
+
+	//cout<<"Printing third map"<<endl;
+	//Mapa3->printMap();
+	//cout<<endl;
+
 
 	Grafo->assignLevel(MapaDisplay);
 
-	list<NodeG*> bestPath;
+	list<shared_ptr<NodeG>> bestPath;
 	Grafo->findPath(bestPath,DestinationB);
 
 
@@ -111,10 +112,10 @@ int main()
 
 	cout<<"\nPrinting Optimal trajectory using A*"<<endl;
 
-	Algorithm = new A_Star(Ix,Iy,Ix + DestinationB->px,Iy + DestinationB->py);
+	Algorithm = make_shared<A_Star>(Ix,Iy,Ix + DestinationB->px,Iy + DestinationB->py);
 	Algorithm->evolve(MapaAS);
 
-	NodeS* Ppointer = Algorithm->returnEndNode();
+	shared_ptr<NodeS> Ppointer = Algorithm->returnEndNode();
 	double CCum = Ppointer->cummulativeDistance;
 	if(Ppointer->Parent==nullptr) cout<<"Did not find it"<<endl;
 	Ppointer = Ppointer->Parent;
@@ -127,4 +128,5 @@ int main()
 	//cout<<"("<< Ppointer->px <<","<< Ppointer->py <<")"<<endl;
 	MapaAS->printMap();
 	cout<<"Cumulative value = "<<CCum<<endl;
+
 }
